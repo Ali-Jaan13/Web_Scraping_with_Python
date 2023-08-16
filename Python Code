@@ -1,42 +1,78 @@
 from bs4 import BeautifulSoup
 import requests
+import smtplib
+import time
+import datetime
+#connecting to the website
 
-url = 'https://en.wikipedia.org/wiki/List_of_largest_companies_in_Pakistan'
+URL = 'https://www.amazon.com/HP-Victus-7-7840HS-Processor-Graphics-dp-B0CDLBZK7Y/dp/B0CDLBZK7Y/ref=dp_ob_title_ce?th=1'
 
-page = requests.get(url)
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36", "Accept-Encoding":"gzip, deflate", "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "DNT":"1","Connection":"close", "Upgrade-Insecure-Requests":"1"}
 
-soup = BeautifulSoup(page.text, 'html')
+page = requests.get(URL, headers = headers)
 
-print(soup)
+soup1 = BeautifulSoup(page.content, 'html.parser')
+soup2 = BeautifulSoup(soup1.prettify(), 'html.parser')
+title = soup2.find(id="productTitle").get_text()
+price = soup2.find('span', attrs = {'class': 'a-offscreen'}).get_text()
+rating = soup2.find('span', attrs = {'class':'a-icon-alt'}).get_text()
+no_of_rating = soup2.find(id="acrCustomerReviewText").get_text()
+print(title)
+print(price)
+print(rating)
+print(no_of_rating)
+print(today)
+price = price.strip()[1:]
+title = title.strip()
+ratings = rating.strip()
+no_of_rating = no_of_rating.strip()
+import csv
+header = ['Title','Price','Rating','Number of Ratings','Date']
+data = [title,price,ratings,no_of_rating,today]
 
-<table class="wikitable sortable jquery-tablesorter">
-
-
-
-table = soup.find_all('table')[1]
-
-print(table)
-
-titles = table.find_all('th' )
-
-titles
-
-titles_table = [title.text.strip() for title in titles]
-print (titles_table)
-
+with open('Laptop Hunting.csv', 'w',newline='',encoding ='UTF8') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    writer.writerow(data)
+today = datetime.date.today()
+print(today)
 import pandas as pd
+df = pd.read_csv(r"C:\Users\malij\Laptop Hunting.csv")
+appending data into the created csv
+with open('Laptop Hunting.csv', 'a+',newline='',encoding ='UTF8') as f:
+    writer = csv.writer(f)
+    writer.writerow(data)
+def check_price():
+    URL = 'https://www.amazon.com/HP-Victus-7-7840HS-Processor-Graphics-dp-B0CDLBZK7Y/dp/B0CDLBZK7Y/ref=dp_ob_title_ce?th=1'
 
-df = pd.DataFrame(columns = titles_table)
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36", "Accept-Encoding":"gzip, deflate", "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "DNT":"1","Connection":"close", "Upgrade-Insecure-Requests":"1"}
 
-column_data = table.find_all('tr')
-print(column_data)
+    page = requests.get(URL, headers = headers)
 
-for row in column_data[1:]:
-    row_data = row.find_all('td')
-    rows = [data.text.strip() for data in row_data]
-    length = len(df)
-    df.loc[length] = rows
+    soup1 = BeautifulSoup(page.content, 'html.parser')
+    soup2 = BeautifulSoup(soup1.prettify(), 'html.parser')
+    title = soup2.find(id="productTitle").get_text()
+    price = soup2.find('span', attrs = {'class': 'a-offscreen'}).get_text()
+    rating = soup2.find('span', attrs = {'class':'a-icon-alt'}).get_text()
+    no_of_rating = soup2.find(id="acrCustomerReviewText").get_text()
+    price = price.strip()[1:]
+    title = title.strip()
+    ratings = rating.strip()
+    no_of_rating = no_of_rating.strip()
+    
+    import datetime
+    today = datetime.date.today()
+    
+    import csv
+    header = ['Title','Price','Rating','Number of Ratings','Date']
+    data = [title,price,ratings,no_of_rating,today]
 
-df
+    with open('Laptop Hunting.csv', 'w',newline='',encoding ='UTF8') as f:
+        writer = csv.writer(f)
+        writer.writerow(data)
+while(True):
+    check_price()
+    time.sleep(86400)
 
-df.to_csv(r'C:\Users\malij\Downloads\companies.csv', index = False)
+
+
